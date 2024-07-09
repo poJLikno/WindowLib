@@ -1,7 +1,7 @@
 #ifndef WINDOWLIB_WINDOW_H
 #define WINDOWLIB_WINDOW_H
 
-#define WINDOWLIB_VERSION "v1.0"
+#define WINDOWLIB_VERSION "v1.1"
 
 #include "WndList.h"
 #include "Button.h"
@@ -13,7 +13,7 @@
 #ifdef WINDOWLIB_NO_CONSOLE
 #pragma comment(linker, "/subsystem:WINDOWS")
 #endif
-#pragma comment(linker, "/entry:wmainCRTStartup")
+#pragma comment(linker, "/entry:mainCRTStartup")
 
 #ifndef WINDOWLIB_NO_MANIFEST
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
@@ -26,17 +26,16 @@ extern "C" IMAGE_DOS_HEADER __ImageBase;
 #define HINST_THISCOMPONENT ((HINSTANCE)&__ImageBase)
 #endif
 
-class Window : public WndBase, public CallbackWindow {
+class Window : public WndBase, public CallbackManager {
 private:
 	// Window variables
-	std::wstring _class_name = L"";
+	wchar_t *_w_class_name = nullptr;
 	MSG _msg = { 0 };
 	HFONT _normal_font = { 0 };
 	bool _ctrls_dlg_msg_flag = false;
 
 	// All exist windows
 	static WndList<Window> _wnd_list;
-
 	// All windows pos/size variables
 	static WndList<WndPairValue> _wnd_pos_list;
 	static WndList<WndPairValue> _wnd_size_list;
@@ -53,14 +52,11 @@ private:
 
 public:
 	Window(
-		const wchar_t *name,
+		const char *name,
 		WndPairValue pos = { CW_USEDEFAULT, CW_USEDEFAULT },
 		WndPairValue size = { CW_USEDEFAULT, CW_USEDEFAULT },
 		int icon_id = -1);
 	~Window();
-
-	template<class T>
-	void SetAsyncWndLoopCallback(T callback);
 
 	void AttachChildControl(WndBase *wnd);
 	void AttachMenu(Menu *menu);
@@ -76,21 +72,22 @@ public:
 	int Run();
 };
 
-template<class T>
-inline void Window::SetAsyncWndLoopCallback(T callback) {
-	_callbacks[0] = callback;
-}
-
-class WndSizeParams {
+class ParentResizeCallbackParams {
 public:
-	Window &_wnd;
-	WndPairValue _old_size;
-	void **_data = nullptr;
-
-	WndSizeParams(Window &wnd, const WndPairValue &old_size)
-		: _wnd(wnd), _old_size(old_size) {}
-
-	~WndSizeParams() = default;
+	WndBase *wnd;
+	WndPairValue old_size;
 };
+
+//class WndSizeParams {
+//public:
+//	Window &_wnd;
+//	WndPairValue _old_size;
+//	void **_data = nullptr;
+//
+//	WndSizeParams(Window &wnd, const WndPairValue &old_size)
+//		: _wnd(wnd), _old_size(old_size) {}
+//
+//	~WndSizeParams() = default;
+//};
 
 #endif

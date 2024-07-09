@@ -56,7 +56,7 @@
     <ClInclude Include="WindowLib\Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WindowLib\WndCallback.h">
+    <ClInclude Include="WindowLib\CallbackManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WindowLib\Button.h">
