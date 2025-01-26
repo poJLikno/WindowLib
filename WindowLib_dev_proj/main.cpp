@@ -27,6 +27,11 @@ int main(int argc, const char **argv) {
     Button btn("Русская кнопка ya!", WndPairValue{ 100, 100 }, WndPairValue{ 50, 25 });
     //Button btn("First button", WndPairValue{ 100, 100 }, WndPairValue{ 50, 25 });
     Button btn_t("Second button", WndPairValue{ 350, 100 }, WndPairValue{ 200, 100 });
+    RadioButton radio_btn("Radio button 1", true, WndPairValue{ 10, 10 }, WndPairValue{ 100, 17 });
+    RadioButton radio_btn_t("Radio button 2", false, WndPairValue{ 10, 30 }, WndPairValue{ 100, 17 });
+    RadioButton radio_btn_u("Radio button 3", true, WndPairValue{ 10, 50 }, WndPairValue{ 100, 17 });
+    RadioButton radio_btn_f("Radio button 4", false, WndPairValue{ 10, 70 }, WndPairValue{ 100, 17 });
+    CheckBox chk_box("Check box 1", WndPairValue{ 10, 100 }, WndPairValue{ 100, 17 });
     ComboBox cmb_bx(WndPairValue{ 100, 350 }, WndPairValue{ 140, 200 });
     Label lbl("govnar_pes Рус", WndPairValue{ 300, 350 }, WndPairValue{ 140, 20 });
     Menu menu;
@@ -62,7 +67,42 @@ int main(int argc, const char **argv) {
             }
             btn.SetWndPos(WndPairValue{ btn.GetWndParent()->GetWndSize().first / 4, btn.GetWndParent()->GetWndSize().second / 6 });
         });
-    
+
+    /* RadioButton 1 */
+    radio_btn.AddCallback("MainCallback", [&j, &btn](void *ptr) {
+        RadioButton *rbtn = GetControl(RadioButton, ptr);
+        std::cout << "RadioButton 1 was pressed!\r\n";
+
+        btn.SetInputState(j % 2 ? false : true);
+        });
+    /* RadioButton 2 */
+    radio_btn_t.AddCallback("MainCallback", [&j, &radio_btn](void *ptr) {
+        RadioButton *rbtn = GetControl(RadioButton, ptr);
+        std::cout << (rbtn->GetState() ? "true - " : "\0") << "RadioButton 2 was pressed!\r\n";
+        std::cout << (radio_btn.GetState() ? "true - " : "false - ") << "RadioButton 1\n";
+        radio_btn.SetState(true);
+        std::cout << (radio_btn.GetState() ? "true - " : "false - ") << "RadioButton 1\n";
+        });
+
+    /* RadioButton 3 */
+    radio_btn_u.AddCallback("MainCallback", [&j](void *ptr) {
+        RadioButton *rbtn = GetControl(RadioButton, ptr);
+        std::cout << "RadioButton 3 was pressed!\r\n";
+        });
+    /* RadioButton 4 */
+    radio_btn_f.AddCallback("MainCallback", [&j](void *ptr) {
+        RadioButton *rbtn = GetControl(RadioButton, ptr);
+        std::cout << "RadioButton 4 was pressed!\r\n";
+        });
+
+    /* CheckBox 1 */
+    chk_box.AddCallback("MainCallback", [&j](void *ptr) {
+        CheckBox *box = GetControl(CheckBox, ptr);
+        
+        box->SetState(!box->GetState());
+        std::cout << "CheckBox 1 was pressed!\r\n";
+        });
+
     // ComboBox 1
     cmb_bx.AddCallback("MainCallback", [](void *ptr) {
             ComboBox &cmb_bx_ref = Callback::GetCallbackParams<ComboBox>(ptr);
@@ -144,6 +184,11 @@ int main(int argc, const char **argv) {
     // Attach controls
     wnd.AttachChildControl(&btn);
     wnd.AttachChildControl(&btn_t);
+    wnd.AttachChildControl(&radio_btn);
+    wnd.AttachChildControl(&radio_btn_t);
+    wnd.AttachChildControl(&radio_btn_u);
+    wnd.AttachChildControl(&radio_btn_f);
+    wnd.AttachChildControl(&chk_box);
     wnd.AttachChildControl(&cmb_bx);
     wnd.AttachChildControl(&lbl);
     wnd.AttachChildControl(&edit);
@@ -156,12 +201,20 @@ int main(int argc, const char **argv) {
     cmb_bx.AddItem("Рус строчка!");
     cmb_bx.AddItem("pososi 3");
     cmb_bx.SelectItem(0);
+    //cmb_bx.SetInputState(false);
+    //btn.SetInputState(false);
+    radio_btn.SetState(true);
 
     // Font
     NormalFont good_font;
     {
         good_font.SetFont(&btn);
         good_font.SetFont(&btn_t);
+        good_font.SetFont(&radio_btn);
+        good_font.SetFont(&radio_btn_t);
+        good_font.SetFont(&radio_btn_u);
+        good_font.SetFont(&radio_btn_f);
+        good_font.SetFont(&chk_box);
         good_font.SetFont(&cmb_bx);
         good_font.SetFont(&lbl);
         good_font.SetFont(&edit);

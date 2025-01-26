@@ -137,18 +137,21 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="WindowLib\Button.cpp" />
+    <ClCompile Include="WindowLib\CheckBox.cpp" />
     <ClCompile Include="WindowLib\ComboBox.cpp" />
     <ClCompile Include="WindowLib\Edit.cpp" />
     <ClCompile Include="WindowLib\Label.cpp" />
     <ClCompile Include="WindowLib\MenuBase.cpp" />
     <ClCompile Include="WindowLib\MenuPoint.cpp" />
     <ClCompile Include="WindowLib\NormalFont.cpp" />
+    <ClCompile Include="WindowLib\RadioButton.cpp" />
     <ClCompile Include="WindowLib\Window.cpp" />
     <ClCompile Include="WindowLib\WndBase.cpp" />
     <ClCompile Include="WindowLib\WndProc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowLib\Button.h" />
+    <ClInclude Include="WindowLib\CheckBox.h" />
     <ClInclude Include="WindowLib\ComboBox.h" />
     <ClInclude Include="WindowLib\Edit.h" />
     <ClInclude Include="WindowLib\Label.h" />
@@ -156,6 +159,7 @@
     <ClInclude Include="WindowLib\MenuBase.h" />
     <ClInclude Include="WindowLib\MenuPoint.h" />
     <ClInclude Include="WindowLib\NormalFont.h" />
+    <ClInclude Include="WindowLib\RadioButton.h" />
     <ClInclude Include="WindowLib\Window.h" />
     <ClInclude Include="WindowLib\WndBase.h" />
     <ClInclude Include="WindowLib\CallbackManager.h" />
