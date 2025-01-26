@@ -4,6 +4,26 @@
 #include <string.h>
 #include <vector>
 
+/* For main callbacks */
+#ifndef GetControl
+#define GetControl(type, ptr) \
+    ((type *)ptr)
+#endif
+
+/* For parent resize callback only */
+#ifndef GetControlForParentResize
+#define GetControlForParentResize(type, ptr) \
+    ((type *)((ParentResizeCallbackParams *)ptr)->wnd)
+#endif
+
+/* For parent resize callback only */
+#ifndef GetMiscForParentResize
+#define GetMiscForParentResize(ptr) \
+    Window *parent_wnd = (Window *)GetControlForParentResize(WndBase, ptr)->GetWndParent();\
+    const WndPairValue &old_parent_size = (const WndPairValue &)((ParentResizeCallbackParams *)ptr)->old_size;\
+    const WndPairValue &new_parent_size = parent_wnd->GetWndSize()
+#endif
+
 // Do callback functions
 class ICall {
 public:

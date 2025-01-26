@@ -23,7 +23,11 @@ void WndBase::GetWndText(char *buffer, const int &count) {
 
     int result = GetWindowTextW(this->_hwnd, w_buffer, (int)count);
     if (!result)
-        throw std::string("Can't get text -> Error code: " + std::to_string(GetLastError()));
+    {
+        int error = GetLastError();
+        if (error)
+            throw std::string("Can't get text -> Error code: " + std::to_string(error));
+    }
 
     WideCharToMultiByte(CP_UTF8, 0, w_buffer, (int)count, buffer, (int)count, 0, 0);
 

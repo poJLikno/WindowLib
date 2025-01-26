@@ -19,7 +19,7 @@ Window::Window(const char *name, WndPairValue pos, WndPairValue size, int icon_i
 
     WNDCLASSW wc = { 0 };
     {
-        wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC | CS_PARENTDC;
+        wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC /*|  CS_PARENTDC (or this or OWNDC or CLASSDC or none) */;
         wc.lpfnWndProc = Window::WndProc;
         wc.cbClsExtra = 0;// 1 - Reserve for ability change WndProc
         wc.cbWndExtra = sizeof(LONG_PTR);
@@ -40,26 +40,26 @@ Window::Window(const char *name, WndPairValue pos, WndPairValue size, int icon_i
     if (!this->_hwnd)
         throw std::string("Can't create window -> Error code: " + std::to_string(GetLastError()));
 
-    //ShowWindow(this->hWnd, SW_SHOWNORMAL);
+    /* Add to global list of windows */
     _wnd_list.Append(this);
     _wnd_pos_list.Append(&_pos);
     _wnd_size_list.Append(&_size);
 
+    _wnd_list_index = _wnd_list.GetCount() - 1;
+
     /* Clean up */
     delete[] w_name;
     w_name = nullptr;
-
-    //Create font
-    /*NONCLIENTMETRICSA ncm = { 0 };
-    SystemParametersInfoA(SPI_GETNONCLIENTMETRICS, sizeof(ncm), &ncm, 0);
-    _normal_font = CreateFontIndirectA(&ncm.lfMessageFont);*/
 }
 
 Window::~Window() {
-    //DeleteObject((HGDIOBJ)_normal_font);
-
     if (!UnregisterClassW(_w_class_name, HINST_THISCOMPONENT))
         MessageBoxW(NULL, std::wstring(L"Can't unregister class -> Error code: " + std::to_wstring(GetLastError())).c_str(), L"Error", MB_OK);
+
+    /* Remve this window from global lists */
+    _wnd_list[_wnd_list_index] = nullptr;
+    _wnd_pos_list[_wnd_list_index] = nullptr;
+    _wnd_size_list[_wnd_list_index] = nullptr;
 
     delete[] _w_class_name;
     _w_class_name = nullptr;

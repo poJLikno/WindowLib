@@ -7,10 +7,10 @@ WndList<WndPairValue> Window::_wnd_pos_list;
 WndList<WndPairValue> Window::_wnd_size_list;
 
 template<class T>
-static void ParentResizeCallbacksCaller(T &ctrls_list, ParentResizeCallbackParams *params);
+static void ParentResizeCallbacksCaller(WndList<T> &ctrls_list, ParentResizeCallbackParams *params);
 
 template<class T>
-static void MainCallbacksCaller(T &ctrls_list, LPARAM &lParam, bool &ctrl_was_found_flag);
+static void MainCallbacksCaller(WndList<T> &ctrls_list, LPARAM &lParam, bool &ctrl_was_found_flag);
 
 static bool MenuMainCallbacksCaller(MenuBase *menu, WPARAM &wParam, bool &ctrl_was_found_flag);
 
@@ -50,6 +50,13 @@ LRESULT Window::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 SetBkMode((HDC)wParam, TRANSPARENT);
                 result = 0;
             }
+            /*else if (uMsg == WM_MOUSEMOVE)
+            {
+                int x = LOWORD(lParam);
+                int y = HIWORD(lParam);
+
+                std::cout << x << " : " << y << "\n";
+            }*/
             else if (uMsg == WM_MOVE) {
                 WndPos->first = LOWORD(lParam);
                 WndPos->second = HIWORD(lParam);
@@ -59,6 +66,7 @@ LRESULT Window::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 ParentResizeCallbackParams params = { nullptr, *WndSize };
                 WndSize->first = LOWORD(lParam);
                 WndSize->second = HIWORD(lParam);
+                //std::cout << WndSize->first << " x " << WndSize->second << "\n";
 
                 // Run parent resize controls callbacks
                 ParentResizeCallbacksCaller(Wnd->GetButtonsList(), &params);
@@ -100,7 +108,7 @@ LRESULT Window::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
             else result = DefWindowProcW(hwnd, uMsg, wParam, lParam);
         }
     }
-    catch (std::string &e) {
+    catch (const std::string &e) {
         int str_size = (int)e.length() + 1;
         wchar_t *w_error = new wchar_t[str_size] { 0 };
         MultiByteToWideChar(CP_UTF8, 0, e.c_str(), str_size, w_error, str_size);
@@ -117,19 +125,19 @@ LRESULT Window::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 }
 
 template<class T>
-static void ParentResizeCallbacksCaller(T &ctrls_list, ParentResizeCallbackParams *params) {
+static void ParentResizeCallbacksCaller(WndList<T> &ctrls_list, ParentResizeCallbackParams *params) {
     for (int i = 0; i < ctrls_list.GetCount(); ++i) {
-        auto *ctrl = ctrls_list[i];
+        T *ctrl = ctrls_list[i];
         params->wnd = ctrl;
         ctrl->operator()("ParentResizeCallback", params);
     }
 }
 
 template<class T>
-static void MainCallbacksCaller(T &ctrls_list, LPARAM &lParam, bool &ctrl_was_found_flag) {
+static void MainCallbacksCaller(WndList<T> &ctrls_list, LPARAM &lParam, bool &ctrl_was_found_flag) {
     if (ctrl_was_found_flag) return;
     for (int i = 0; i < ctrls_list.GetCount(); ++i) {
-        auto *ctrl = ctrls_list[i];
+        T *ctrl = ctrls_list[i];
         if (lParam == (LPARAM)ctrl->GetHwnd()) {
             ctrl->operator()("MainCallback", ctrl);
             ctrl_was_found_flag = true;

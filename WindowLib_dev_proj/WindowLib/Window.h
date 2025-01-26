@@ -1,7 +1,7 @@
 #ifndef WINDOWLIB_WINDOW_H
 #define WINDOWLIB_WINDOW_H
 
-#define WINDOWLIB_VERSION "v1.1"
+#define WINDOWLIB_VERSION "v1.2"
 
 #include "WndList.h"
 #include "Button.h"
@@ -31,7 +31,7 @@ private:
     // Window variables
     wchar_t *_w_class_name = nullptr;
     MSG _msg = { 0 };
-    HFONT _normal_font = { 0 };
+    //HFONT _normal_font = { 0 };
     bool _ctrls_dlg_msg_flag = false;
 
     // All exist windows
@@ -39,6 +39,8 @@ private:
     // All windows pos/size variables
     static WndList<WndPairValue> _wnd_pos_list;
     static WndList<WndPairValue> _wnd_size_list;
+    /* the Window index in lists */
+    int _wnd_list_index = 0;
 
     // Window controls lists
     WndList<Button> _btns_list;
