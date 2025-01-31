@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <thread>
 
+#define WINDOWLIB_USE_MANIFEST
 //#define WINDOWLIB_NO_CONSOLE
 
 #include "WindowLib/Window.h"
@@ -39,134 +40,182 @@ int main(int argc, const char **argv) {
 
     // Button 1
     btn.AddCallback("MainCallback", [&j](void *ptr) {
-        Button &btn = Callback::GetCallbackParams<Button>(ptr);
-            btn.SetWndText(std::to_string(j++).c_str());
-            std::cout << "Button 1 was pressed!\r\n";
-        });
+
+        Button *btn = GetControl(Button, ptr);
+
+        btn->SetWndText(std::to_string(j++).c_str());
+        std::cout << "Button 1 was pressed!\r\n";
+    });
     btn.AddCallback("ParentResizeCallback", [](void *ptr) {
-            ParentResizeCallbackParams &params = Callback::GetCallbackParams<ParentResizeCallbackParams>(ptr);
-            Button &btn = Callback::GetCallbackParams<Button>(params.wnd);/**((Button *)params.wnd);*/
-            WndPairValue &size = params.old_size;
-            if (btn.GetWndParent() == nullptr) {
-                return;
-            }
-            btn.SetWndSize(WndPairValue{ btn.GetWndParent()->GetWndSize().first / 4, btn.GetWndParent()->GetWndSize().second / 6});
-        });
+
+        Button *btn = GetControlForParentResize(Button, ptr);
+        GetMiscForParentResize(ptr);
+        /*Expands to:
+        * Window *parent_wnd = ...
+        * const WndPairValue &old_parent_size = ...
+        * const WndPairValue &new_parent_size = ...
+        */
+
+        if (parent_wnd == nullptr) {
+            return;
+        }
+        btn->SetWndSize(WndPairValue{ new_parent_size.first / 4, new_parent_size.second / 6});
+    });
 
     //Button 2
     btn_t.AddCallback("MainCallback", [&j](void *ptr) {
-            Button &btn_ref = Callback::GetCallbackParams<Button>(ptr);
-            btn_ref.SetWndText(std::to_string(-(j++)).c_str());
-            std::cout << "Button 2 was pressed!\r\n";
-        });
+
+        Button *btn = GetControl(Button, ptr);
+
+        btn->SetWndText(std::to_string(-(j++)).c_str());
+        std::cout << "Button 2 was pressed!\r\n";
+    });
     btn_t.AddCallback("ParentResizeCallback", [](void *ptr) {
-            ParentResizeCallbackParams &params = Callback::GetCallbackParams<ParentResizeCallbackParams>(ptr);
-            Button &btn = Callback::GetCallbackParams<Button>(params.wnd);
-            if (btn.GetWndParent() == nullptr) {
-                return;
-            }
-            btn.SetWndPos(WndPairValue{ btn.GetWndParent()->GetWndSize().first / 4, btn.GetWndParent()->GetWndSize().second / 6 });
-        });
+
+        Button *btn = GetControlForParentResize(Button, ptr);
+        GetMiscForParentResize(ptr);
+
+        if (parent_wnd == nullptr) {
+            return;
+        }
+        btn->SetWndPos(WndPairValue{ new_parent_size.first / 4, new_parent_size.second / 6 });
+    });
 
     /* RadioButton 1 */
     radio_btn.AddCallback("MainCallback", [&j, &btn](void *ptr) {
-        RadioButton *rbtn = GetControl(RadioButton, ptr);
-        std::cout << "RadioButton 1 was pressed!\r\n";
 
-        btn.SetInputState(j % 2 ? false : true);
-        });
+        RadioButton *rbtn = GetControl(RadioButton, ptr);
+        /* Prevent false activation */
+        if (rbtn->GetState())
+        {
+            std::cout << "RadioButton 1 was pressed!\r\n";
+
+            btn.SetInputState(j % 2 ? false : true);
+        }
+    });
     /* RadioButton 2 */
     radio_btn_t.AddCallback("MainCallback", [&j, &radio_btn](void *ptr) {
+
         RadioButton *rbtn = GetControl(RadioButton, ptr);
-        std::cout << (rbtn->GetState() ? "true - " : "\0") << "RadioButton 2 was pressed!\r\n";
-        std::cout << (radio_btn.GetState() ? "true - " : "false - ") << "RadioButton 1\n";
-        radio_btn.SetState(true);
-        std::cout << (radio_btn.GetState() ? "true - " : "false - ") << "RadioButton 1\n";
-        });
+        /* Prevent false activation */
+        if (rbtn->GetState())
+        {
+            std::cout << (rbtn->GetState() ? "true - " : "\0") << "RadioButton 2 was pressed!\r\n";
+            std::cout << (radio_btn.GetState() ? "true - " : "false - ") << "RadioButton 1\n";
+            radio_btn.SetState(true);
+            std::cout << (radio_btn.GetState() ? "true - " : "false - ") << "RadioButton 1\n";
+        }
+    });
 
     /* RadioButton 3 */
     radio_btn_u.AddCallback("MainCallback", [&j](void *ptr) {
+
         RadioButton *rbtn = GetControl(RadioButton, ptr);
-        std::cout << "RadioButton 3 was pressed!\r\n";
-        });
+        /* Prevent false activation */
+        if (rbtn->GetState())
+        {
+            std::cout << "RadioButton 3 was pressed!\r\n";
+        }
+    });
     /* RadioButton 4 */
     radio_btn_f.AddCallback("MainCallback", [&j](void *ptr) {
+
         RadioButton *rbtn = GetControl(RadioButton, ptr);
-        std::cout << "RadioButton 4 was pressed!\r\n";
-        });
+        /* Prevent false activation */
+        if (rbtn->GetState())
+        {
+            std::cout << "RadioButton 4 was pressed!\r\n";
+        }
+    });
 
     /* CheckBox 1 */
     chk_box.AddCallback("MainCallback", [&j](void *ptr) {
+
         CheckBox *box = GetControl(CheckBox, ptr);
         
         box->SetState(!box->GetState());
         std::cout << "CheckBox 1 was pressed!\r\n";
-        });
+    });
 
     // ComboBox 1
     cmb_bx.AddCallback("MainCallback", [](void *ptr) {
-            ComboBox &cmb_bx_ref = Callback::GetCallbackParams<ComboBox>(ptr);
-            char str[32] = { 0 };
-            cmb_bx_ref.GetItem(str, 32);
-            std::wcout << cmb_bx_ref.GetItemId() << " |----| " << str << "\r\n";
-        });
+
+        ComboBox *cmb_bx = GetControl(ComboBox, ptr);
+
+        char str[32] = { 0 };
+        cmb_bx->GetItem(str, 32);
+        std::wcout << cmb_bx->GetItemId() << " |----| " << str << "\r\n";
+    });
     cmb_bx.AddCallback("ParentResizeCallback", [](void *ptr) {
-            ParentResizeCallbackParams &params = Callback::GetCallbackParams<ParentResizeCallbackParams>(ptr);
-            ComboBox &cmb_bx_ref = Callback::GetCallbackParams<ComboBox>(params.wnd);
-            if (cmb_bx_ref.GetWndParent() == nullptr) {
-                return;
-            }
-            cmb_bx_ref.SetWndSize(WndPairValue{ cmb_bx_ref.GetWndParent()->GetWndSize().first / 4, cmb_bx_ref.GetWndParent()->GetWndSize().second / 6 });
-            cmb_bx_ref.SetWndPos(WndPairValue{ cmb_bx_ref.GetWndParent()->GetWndSize().first / 2, cmb_bx_ref.GetWndParent()->GetWndSize().second / 4 });
-        });
+
+        ComboBox *cmb_bx = GetControlForParentResize(ComboBox, ptr);
+        GetMiscForParentResize(ptr);
+
+        if (parent_wnd == nullptr) {
+            return;
+        }
+        cmb_bx->SetWndSize(WndPairValue{ new_parent_size.first / 4, new_parent_size.second / 6 });
+        cmb_bx->SetWndPos(WndPairValue{ new_parent_size.first / 2, new_parent_size.second / 4 });
+    });
 
     // Label 1
     lbl.AddCallback("ParentResizeCallback", [](void *ptr) {
-            ParentResizeCallbackParams &params = Callback::GetCallbackParams<ParentResizeCallbackParams>(ptr);
-            Label &lbl_ref = Callback::GetCallbackParams<Label>(params.wnd);
-            if (lbl_ref.GetWndParent() == nullptr) {
-                return;
-            }
-            //lbl_ref.SetWndSize(WndPairValue{ lbl_ref.GetWndParent()->GetWndSize().first / 4, lbl_ref.GetWndParent()->GetWndSize().second / 30 });
-            lbl_ref.SetWndPos(WndPairValue{ lbl_ref.GetWndParent()->GetWndSize().first / 2, lbl_ref.GetWndParent()->GetWndSize().second / 3 });
-        });
+
+        Label *lbl = GetControlForParentResize(Label, ptr);
+        GetMiscForParentResize(ptr);
+
+        if (parent_wnd == nullptr) {
+            return;
+        }
+
+        lbl->SetWndPos(WndPairValue{ new_parent_size.first / 2, new_parent_size.second / 3 });
+    });
 
     // Edit 1
     edit.AddCallback("MainCallback", [](void *ptr) {
-            try {
-                Edit &edit_ref = Callback::GetCallbackParams<Edit>(ptr);
-                char str[32] = { 0 };
-                edit_ref.GetWndText(str, 32);
-                std::cout << str << "\r\n";
-            }
-            catch (std::string &/*error*/) {
-                std::cout << "None\r\n";
-            }
-        });
+
+        try
+        {
+            Edit *edit = GetControl(Edit, ptr);
+
+            char str[32] = { 0 };
+            edit->GetWndText(str, 32);
+            std::cout << str << "\r\n";
+        }
+        catch (const std::string &/*error*/)
+        {
+            std::cout << "None\r\n";
+        }
+    });
     edit.AddCallback("ParentResizeCallback", [](void *ptr) {
-            ParentResizeCallbackParams &params = Callback::GetCallbackParams<ParentResizeCallbackParams>(ptr);
-            Edit &edit_ref = Callback::GetCallbackParams<Edit>(params.wnd);
-            if (edit_ref.GetWndParent() == nullptr) {
-                return;
-            }
-            //edit_ref.SetWndSize(WndPairValue{ params._wnd.GetWndSize().first / 4, params._wnd.GetWndSize().second / 6 });
-            edit_ref.SetWndPos(WndPairValue{ edit_ref.GetWndParent()->GetWndSize().first / 4, edit_ref.GetWndParent()->GetWndSize().second / 6 });
-        });
+
+        Edit *edit = GetControlForParentResize(Edit, ptr);
+        GetMiscForParentResize(ptr);
+
+        if (parent_wnd == nullptr) {
+            return;
+        }
+
+        edit->SetWndPos(WndPairValue{ new_parent_size.first / 4, new_parent_size.second / 6 });
+    });
 
     // Menu & menu points
     MenuPoint p_f("First");
     MenuPoint p_s("Second");
     p_f.AddCallback("MainCallback", [&p_s, &wnd](void *ptr) {
-            MenuPoint &menu_point = Callback::GetCallbackParams<MenuPoint>(ptr);
-            p_s.SetState(!p_s.GetState());
 
-            std::cout << "First is work!\r\n";
-        });
+        MenuPoint *menu_point = GetControl(MenuPoint, ptr);
+
+        p_s.SetState(!p_s.GetState());
+
+        std::cout << "First is work!\r\n";
+    });
     p_s.AddCallback("MainCallback", [&btn_t, &wnd, &j](void *ptr) {
-            btn_t.ShowWnd(j % 2);
 
-            std::cout << "Second is work!\r\n";
-        });
+        btn_t.ShowWnd(j % 2);
+
+        std::cout << "Second is work!\r\n";
+    });
 
     PopupMenu pop_s("Second popup");
     pop_s.AttachMenuPoint(&p_f);

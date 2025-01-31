@@ -23,7 +23,10 @@ LRESULT Window::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
         WndPairValue *WndPos = nullptr;
         WndPairValue *WndSize = nullptr;
         for (int i = 0; i < _wnd_list.GetCount(); ++i) {
-            if (hwnd == _wnd_list[i]->GetHwnd()) {
+            if (!_wnd_list[i]) {
+                continue;
+            }
+            else if (hwnd == _wnd_list[i]->GetHwnd()) {
                 Wnd = _wnd_list[i];
                 WndPos = _wnd_pos_list[i];
                 WndSize = _wnd_size_list[i];
@@ -40,13 +43,15 @@ LRESULT Window::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 if (wParam == VK_ESCAPE) DestroyWindow(hwnd);
                 result = 0;
             }*/
-            /*if (uMsg == WM_GETMINMAXINFO)
+            if (uMsg == WM_GETMINMAXINFO)
             {
                 LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
-                lpMMI->ptMinTrackSize.x = 752 + 16;// 16 * 47 +...
-                lpMMI->ptMinTrackSize.y = 301 + 59;//423 + 59;// 9 * 47 +...
-            }*/
-            if (uMsg == WM_CTLCOLORSTATIC) {// !!! For transparent "Label" !!!
+                lpMMI->ptMinTrackSize.x = 520 + 16;/* (+16) if-func loose compensation */
+                lpMMI->ptMinTrackSize.y = 77 + 59;/* (+59) if-func loose compensation */
+
+                result = 0;
+            }
+            else if (uMsg == WM_CTLCOLORSTATIC) {// !!! For transparent "Label" !!!
                 SetBkMode((HDC)wParam, TRANSPARENT);
                 result = 0;
             }
@@ -56,17 +61,31 @@ LRESULT Window::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
                 int y = HIWORD(lParam);
 
                 std::cout << x << " : " << y << "\n";
+
+                result = 0;
             }*/
+            else if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN)
+            {
+                SetFocus(Wnd->GetHwnd());
+
+                result = 0;
+            }
             else if (uMsg == WM_MOVE) {
                 WndPos->first = LOWORD(lParam);
                 WndPos->second = HIWORD(lParam);
+
                 result = 0;
             }
             else if (uMsg == WM_SIZE) {
                 ParentResizeCallbackParams params = { nullptr, *WndSize };
                 WndSize->first = LOWORD(lParam);
                 WndSize->second = HIWORD(lParam);
-                //std::cout << WndSize->first << " x " << WndSize->second << "\n";
+
+                /* Size log */
+                /*std::cout << "Client rect -- " << WndSize->first << " x " << WndSize->second << "\n";
+                RECT rect = { 0 };
+                GetWindowRect(Wnd->GetHwnd(), &rect);
+                std::cout << "Entire window rect -- " << rect.right - rect.left << " x " << rect.bottom - rect.top << "\n";*/
 
                 // Run parent resize controls callbacks
                 ParentResizeCallbacksCaller(Wnd->GetButtonsList(), &params);
