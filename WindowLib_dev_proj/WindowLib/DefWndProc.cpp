@@ -62,7 +62,8 @@ LRESULT Window::_DefWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         else if (msg == WM_CTLCOLORSTATIC)/* !!!For transparent "Label" !!!*/
         {
             SetBkMode((HDC)wparam, TRANSPARENT);
-            result = 0;/* must be a brush handle | ??? */
+            result = reinterpret_cast<LRESULT>(GetStockObject(WHITE_BRUSH));
+            //result = 0;/* must be a brush handle | ??? */
         }
         /*else if (msg == WM_MOUSEMOVE)
         {
@@ -148,7 +149,7 @@ LRESULT Window::_DefWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     }
     catch (const std::string &error)
     {
-        std::unique_ptr<wchar_t[]> w_error(to_utf16(error.c_str()));
+        std::unique_ptr<wchar_t[]> w_error(utf8_to_utf16(error.c_str()));
 
         MessageBoxW(NULL, w_error.get(), L"Error", MB_OK);
 

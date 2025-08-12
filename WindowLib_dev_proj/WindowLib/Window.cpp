@@ -11,7 +11,7 @@ Window::Window(const char *name, const std::pair<int, int> &pos, const std::pair
     _wnd_index = _wnd_list.Append(&_wnd_pos_size);
 
     // Register window class
-    _w_class_name = std::unique_ptr<wchar_t[]>(to_utf16(std::string(std::regex_replace(name, std::regex(" "), "_") + std::string("_") + std::to_string(_wnd_index) + std::string("_class")).c_str()));
+    _w_class_name = std::unique_ptr<wchar_t[]>(utf8_to_utf16(std::string(std::regex_replace(name, std::regex(" "), "_") + std::string("_") + std::to_string(_wnd_index) + std::string("_class")).c_str()));
 
     WNDCLASSW wc = { 0 };
     {
@@ -34,7 +34,7 @@ Window::Window(const char *name, const std::pair<int, int> &pos, const std::pair
     }
     
     // Create window
-    std::unique_ptr<wchar_t[]> w_name(to_utf16(name));
+    std::unique_ptr<wchar_t[]> w_name(utf8_to_utf16(name));
 
     _hwnd = CreateWindowExW(
         0L, wc.lpszClassName, w_name.get(), wnd_style,

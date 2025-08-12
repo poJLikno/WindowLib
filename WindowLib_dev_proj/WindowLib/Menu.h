@@ -32,7 +32,7 @@ public:
 
     virtual void SetHParent(void *hparent) override
     {
-        std::unique_ptr<wchar_t[]> w_text(to_utf16(_text));
+        std::unique_ptr<wchar_t[]> w_text(utf8_to_utf16(_text));
 
         AppendMenuW((HMENU)hparent, MF_POPUP, (UINT_PTR)_hmenu, w_text.get());
     }

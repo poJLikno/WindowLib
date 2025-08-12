@@ -10,7 +10,7 @@ MenuPoint::MenuPoint(const char *text, const MenuPointType &menu_point_type)
 
 void MenuPoint::SetMenuParent(HMENU hmenu)
 {
-    std::unique_ptr<wchar_t[]> w_text(to_utf16(_text));
+    std::unique_ptr<wchar_t[]> w_text(utf8_to_utf16(_text));
 
     AppendMenuW(hmenu, _type, _id, w_text.get());
     _parent_hmenu = hmenu;

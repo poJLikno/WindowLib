@@ -7,19 +7,19 @@
 
 /* For main callbacks */
 #ifndef GetControl
-#define GetControl(type, ptr) ((type *)ptr)
+#define GetControl(type, ptr) (static_cast<type *>(ptr))
 #endif
 
 /* For parent resize callback only */
 #ifndef GetControlForParentResize
-#define GetControlForParentResize(type, ptr) ((type *)((ParentResizeCallbackParams *)ptr)->wnd)
+#define GetControlForParentResize(type, ptr) (static_cast<type *>(static_cast<ParentResizeCallbackParams *>(ptr)->wnd))
 #endif
 
 /* For parent resize callback only */
 #ifndef GetMiscForParentResize
 #define GetMiscForParentResize(ptr) \
-    Window *parent_wnd = (Window *)GetControlForParentResize(WndBase, ptr)->GetWndParent();\
-    const std::pair<int, int> &old_parent_wnd_size = (const std::pair<int, int> &)((ParentResizeCallbackParams *)ptr)->old_size;\
+    Window *parent_wnd = static_cast<Window *>(GetControlForParentResize(WndBase, ptr)->GetWndParent());\
+    const std::pair<int, int> &old_parent_wnd_size = static_cast<const std::pair<int, int> &>(static_cast<ParentResizeCallbackParams *>(ptr)->old_size);\
     const std::pair<int, int> &new_parent_wnd_size = parent_wnd->GetWndSize()
 #endif
 

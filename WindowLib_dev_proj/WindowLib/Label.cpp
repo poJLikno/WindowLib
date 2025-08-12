@@ -6,7 +6,7 @@ Label::Label(const char *text, const std::pair<int, int> &pos, const std::pair<i
 
 void Label::SetWndParent(WndBase *wnd)
 {
-    std::unique_ptr<wchar_t[]> w_text(to_utf16(_text));
+    std::unique_ptr<wchar_t[]> w_text(utf8_to_utf16(_text));
 
     _hwnd = CreateWindowExW(
         0L, L"static", w_text.get(), WS_VISIBLE | WS_CHILD /*WS_POPUP*/,

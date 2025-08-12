@@ -1,7 +1,7 @@
 #ifndef WINDOWLIB_WINDOW_H_
 #define WINDOWLIB_WINDOW_H_
 
-#define WINDOWLIB_VERSION "v1.5"
+#define WINDOWLIB_VERSION "v1.6"
 
 #include "WndList.h"
 #include "Button.h"

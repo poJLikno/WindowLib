@@ -22,7 +22,7 @@ void ComboBox::SetWndParent(WndBase *wnd)
 
 void ComboBox::AddItem(const char *text)
 {
-    std::unique_ptr<wchar_t[]> w_text(to_utf16(text));
+    std::unique_ptr<wchar_t[]> w_text(utf8_to_utf16(text));
 
     SendMsg(CB_ADDSTRING, NULL, (LPARAM)w_text.get());
 }
@@ -50,7 +50,7 @@ char *ComboBox::GetItem(int &bytes_were_written)
 
     SendMsg(CB_GETLBTEXT, (WPARAM)GetItemId(), (LPARAM)w_buffer.get());
 
-    return to_utf8(w_buffer.get(), bytes_were_written);
+    return utf16_to_utf8(w_buffer.get(), bytes_were_written);
 }
 
 /* Need free after use (delete[] ...) */
@@ -67,5 +67,5 @@ char *ComboBox::GetOldItem(const int &max_symbols_count/* include null-symbol */
 
     GetWindowTextW(_hwnd, w_buffer.get(), max_symbols_count);
 
-    return to_utf8(w_buffer.get());
+    return utf16_to_utf8(w_buffer.get());
 }

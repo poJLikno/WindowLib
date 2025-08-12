@@ -6,7 +6,7 @@ CheckBox::CheckBox(const char *text, const std::pair<int, int> &pos, const std::
 
 void CheckBox::SetWndParent(WndBase *wnd)
 {
-    std::unique_ptr<wchar_t[]> w_text(to_utf16(_text));
+    std::unique_ptr<wchar_t[]> w_text(utf8_to_utf16(_text));
 
     _hwnd = CreateWindowExW(
         0L, L"button", w_text.get(), BS_CHECKBOX | WS_VISIBLE | WS_CHILD | WS_TABSTOP /*WS_POPUP*/,

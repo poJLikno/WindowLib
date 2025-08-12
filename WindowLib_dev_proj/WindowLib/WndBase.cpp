@@ -51,12 +51,12 @@ char *WndBase::GetWndText(const int &max_symbols_count)
         }
     }
     
-    return to_utf8(w_buffer.get());
+    return utf16_to_utf8(w_buffer.get());
 }
 
 void WndBase::SetWndText(const char *text)
 {
-    std::unique_ptr<wchar_t[]>w_buffer(to_utf16(text));
+    std::unique_ptr<wchar_t[]>w_buffer(utf8_to_utf16(text));
 
     if (SetWindowTextW(_hwnd, w_buffer.get()) == 0)
     {

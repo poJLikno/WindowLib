@@ -6,7 +6,7 @@ RadioButton::RadioButton(const char *text, const bool &create_new_group, const s
 
 void RadioButton::SetWndParent(WndBase *wnd)
 {
-    std::unique_ptr<wchar_t[]> w_text(to_utf16(_text));
+    std::unique_ptr<wchar_t[]> w_text(utf8_to_utf16(_text));
 
     _hwnd = CreateWindowExW(
         0L, L"button", w_text.get(), BS_AUTORADIOBUTTON | (_new_group ? WS_GROUP | WS_TABSTOP : 0) | WS_VISIBLE | WS_CHILD /*WS_POPUP*/,
